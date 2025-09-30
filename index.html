@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Notizen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #333;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    header input {
+      padding: 5px;
+      margin-right: 5px;
+    }
+    #container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #noteBox {
+      width: 60%;
+      height: 70%;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    textarea, pre {
+      flex: 1;
+      width: 100%;
+      resize: none;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    #controls {
+      margin-top: 10px;
+      text-align: right;
+    }
+    button {
+      padding: 6px 12px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <input type="password" id="password" placeholder="Passwort">
+    <button onclick="login()">Login</button>
+  </header>
+  
+  <div id="container">
+    <div id="noteBox">
+      <pre id="noteDisplay"></pre>
+      <textarea id="noteEdit" style="display:none;"></textarea>
+      <div id="controls" style="display:none;">
+        <button onclick="toggleMode()">Modus wechseln</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_PASSWORD = "1234"; // <- Passwort ändern
+    let editMode = false;
+    let loggedIn = false;
+
+    const noteDisplay = document.getElementById("noteDisplay");
+    const noteEdit = document.getElementById("noteEdit");
+    const controls = document.getElementById("controls");
+
+    // Notiz laden
+    function loadNote() {
+      const saved = localStorage.getItem("myNote");
+      if (saved) {
+        noteDisplay.textContent = saved;
+        noteEdit.value = saved;
+      }
+    }
+
+    // Jede Änderung sofort speichern
+    noteEdit.addEventListener("input", () => {
+      localStorage.setItem("myNote", noteEdit.value);
+      noteDisplay.textContent = noteEdit.value;
+    });
+
+    function toggleMode() {
+      editMode = !editMode;
+      if (editMode) {
+        noteDisplay.style.display = "none";
+        noteEdit.style.display = "block";
+      } else {
+        noteDisplay.style.display = "block";
+        noteEdit.style.display = "none";
+      }
+    }
+
+    function login() {
+      const pw = document.getElementById("password").value;
+      if (pw === CORRECT_PASSWORD) {
+        loggedIn = true;
+        controls.style.display = "block";
+        alert("Login erfolgreich!");
+      } else {
+        alert("Falsches Passwort!");
+      }
+    }
+
+    loadNote();
+  </script>
+</body>
+</html>
