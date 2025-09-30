@@ -1,127 +1,77 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Mini-Chat</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-    }
-    #chatBox {
-      flex: 1;
-      width: 60%;
-      background: white;
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 10px;
-      overflow-y: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    .message {
-      padding: 5px;
-      margin: 5px 0;
-      border-bottom: 1px solid #ddd;
-    }
-    .name {
-      font-weight: bold;
-    }
-    #inputBox {
-      display: flex;
-      width: 60%;
-      margin: 10px 0;
-    }
-    #inputBox input {
-      flex: 1;
-      padding: 8px;
-      margin-right: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 8px 12px;
-      border: none;
-      background: #333;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #userSetup {
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bild Generator</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  canvas {
+    border: 2px solid #333;
+    margin-bottom: 20px;
+  }
+  button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-  <h2>Mini-Chat</h2>
+<canvas id="myCanvas" width="400" height="400"></canvas>
+<div>
+  <button id="newBtn">Neu machen</button>
+  <button id="downloadBtn">Download</button>
+</div>
 
-  <div id="userSetup">
-    <input type="text" id="username" placeholder="Dein Name">
-    <input type="text" id="character" placeholder="Emoji/Charakter">
-    <button onclick="setUser()">Speichern</button>
-  </div>
+<script>
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
 
-  <div id="chatBox"></div>
+function generateImage() {
+    // Zufälliger Farbverlauf
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, getRandomColor());
+    gradient.addColorStop(1, getRandomColor());
 
-  <div id="inputBox" style="display:none;">
-    <input type="text" id="messageInput" placeholder="Nachricht eingeben...">
-    <button onclick="sendMessage()">Senden</button>
-  </div>
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  <script>
-    let currentUser = null;
-    let currentChar = "🙂";
-
-    // Chat laden
-    function loadChat() {
-      const saved = JSON.parse(localStorage.getItem("chatLog")) || [];
-      const chatBox = document.getElementById("chatBox");
-      chatBox.innerHTML = "";
-      saved.forEach(msg => {
-        const div = document.createElement("div");
-        div.className = "message";
-        div.innerHTML = `<span class="name">${msg.char} ${msg.user}:</span> ${msg.text}`;
-        chatBox.appendChild(div);
-      });
-      chatBox.scrollTop = chatBox.scrollHeight;
+    // Zufällige Kreise hinzufügen
+    for(let i = 0; i < 20; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 50, 0, Math.PI * 2);
+        ctx.fillStyle = getRandomColor();
+        ctx.fill();
     }
+}
 
-    // Nachricht senden
-    function sendMessage() {
-      const input = document.getElementById("messageInput");
-      const text = input.value.trim();
-      if (!text) return;
+function getRandomColor() {
+    return `rgb(${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)})`;
+}
 
-      const saved = JSON.parse(localStorage.getItem("chatLog")) || [];
-      saved.push({ user: currentUser, char: currentChar, text });
-      localStorage.setItem("chatLog", JSON.stringify(saved));
+// Event Listeners
+document.getElementById('newBtn').addEventListener('click', generateImage);
+document.getElementById('downloadBtn').addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'bild.png';
+    link.href = canvas.toDataURL();
+    link.click();
+});
 
-      input.value = "";
-      loadChat();
-    }
+// Initiales Bild generieren
+generateImage();
+</script>
 
-    // User setzen
-    function setUser() {
-      const name = document.getElementById("username").value.trim();
-      const char = document.getElementById("character").value.trim() || "🙂";
-      if (!name) {
-        alert("Bitte gib einen Namen ein!");
-        return;
-      }
-      currentUser = name;
-      currentChar = char;
-      document.getElementById("userSetup").style.display = "none";
-      document.getElementById("inputBox").style.display = "flex";
-    }
-
-    // Chat beim Start laden
-    loadChat();
-  </script>
 </body>
 </html>
